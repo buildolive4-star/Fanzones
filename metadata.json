@@ -1,0 +1,6 @@
+{
+  "name": "FanZones",
+  "description": "Native Android app wrapper for FanZones (fanzones.site)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
