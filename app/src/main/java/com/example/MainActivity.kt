@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.ViewGroup
-
 import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
@@ -55,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -82,7 +80,7 @@ fun MainScreen(targetUrl: String) {
     var showSplash by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        delay(1600) // Professional splash screen duration
+        delay(1500)
         showSplash = false
     }
 
@@ -132,7 +130,7 @@ fun SplashScreen() {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.SportsEsports,
+                    imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Logo",
                     tint = Color.White,
                     modifier = Modifier.size(48.dp)
@@ -148,7 +146,7 @@ fun SplashScreen() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Your Ultimate Fan Community",
+                text = "Streaming Experience",
                 color = Color(0xFFB0BEC5),
                 fontSize = 14.sp
             )
@@ -195,7 +193,6 @@ fun FanZonesApp(targetUrl: String) {
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { _ -> }
 
-    // Network connectivity observer
     DisposableEffect(context) {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -226,39 +223,34 @@ fun FanZonesApp(targetUrl: String) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
+            // Sleek native app header (NO website URL display to look 100% native)
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .size(34.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                    .background(
+                                        Brush.linearGradient(
+                                            listOf(Color(0xFF9C27B0), Color(0xFF00E5FF))
+                                        )
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Public,
+                                    imageVector = Icons.Default.PlayArrow,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(18.dp)
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = currentTitle.ifEmpty { "FanZones" },
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = "fanzones.site",
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "FanZones",
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                            )
                         }
                     },
                     actions = {
@@ -299,7 +291,7 @@ fun FanZonesApp(targetUrl: String) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Open in Browser") },
+                                text = { Text("Open in External Browser") },
                                 onClick = {
                                     showMenu = false
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(currentUrl))
@@ -336,7 +328,7 @@ fun FanZonesApp(targetUrl: String) {
             }
         },
         bottomBar = {
-            // Native feeling bottom navigation dock for quick navigation
+            // Native navigation bar
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surface,
