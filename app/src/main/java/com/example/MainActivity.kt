@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -173,13 +172,9 @@ fun FanZonesApp(targetUrl: String) {
 
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var currentUrl by remember { mutableStateOf(targetUrl) }
-    var currentTitle by remember { mutableStateOf("FanZones") }
-    var progress by remember { mutableFloatStateOf(0f) }
-    var isLoading by remember { mutableStateOf(true) }
     var canGoBack by remember { mutableStateOf(false) }
     var canGoForward by remember { mutableStateOf(false) }
     var isOffline by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
 
     var filePathCallback by remember { mutableStateOf<ValueCallback<Array<Uri>>?>(null) }
 
@@ -225,124 +220,20 @@ fun FanZonesApp(targetUrl: String) {
         webViewInstance?.goBack()
     }
 
+    // NO TOP BAR! True 100% Fullscreen Immersive Native App layout
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            // Sleek native app header (NO website URL display to look 100% native)
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
-                TopAppBar(
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(
-                                        Brush.linearGradient(
-                                            listOf(Color(0xFF9C27B0), Color(0xFF00E5FF))
-                                        )
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "FanZones",
-                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = { webViewInstance?.reload() },
-                            modifier = Modifier.testTag("reload_button")
-                        ) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Reload")
-                        }
-
-                        IconButton(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, "FanZones")
-                                    putExtra(Intent.EXTRA_TEXT, currentUrl)
-                                }
-                                context.startActivity(Intent.createChooser(intent, "Share FanZones"))
-                            },
-                            modifier = Modifier.testTag("share_button")
-                        ) {
-                            Icon(Icons.Default.Share, contentDescription = "Share")
-                        }
-
-                        IconButton(onClick = { showMenu = !showMenu }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-                        }
-
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Home / Reset") },
-                                onClick = {
-                                    showMenu = false
-                                    webViewInstance?.loadUrl(targetUrl)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Open in External Browser") },
-                                onClick = {
-                                    showMenu = false
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(currentUrl))
-                                    context.startActivity(intent)
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Clear App Cache") },
-                                onClick = {
-                                    showMenu = false
-                                    webViewInstance?.clearCache(true)
-                                    CookieManager.getInstance().removeAllCookies(null)
-                                    Toast.makeText(context, "Cache cleared successfully", Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-
-                if (isLoading) {
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(2.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                }
-            }
-        },
         bottomBar = {
-            // Native navigation bar
+            // Minimalist native floating bottom control dock
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                 tonalElevation = 8.dp
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 24.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -370,11 +261,11 @@ fun FanZonesApp(targetUrl: String) {
 
                     FloatingActionButton(
                         onClick = { webViewInstance?.loadUrl(targetUrl) },
-                        modifier = Modifier.size(44.dp),
+                        modifier = Modifier.size(40.dp),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ) {
-                        Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(22.dp))
+                        Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(20.dp))
                     }
 
                     IconButton(
@@ -395,7 +286,7 @@ fun FanZonesApp(targetUrl: String) {
                     ) {
                         Icon(
                             imageVector = Icons.Default.OpenInBrowser,
-                            contentDescription = "Browser",
+                            contentDescription = "Open in Chrome",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -432,17 +323,14 @@ fun FanZonesApp(targetUrl: String) {
                         webViewClient = object : WebViewClient() {
                             override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                                 super.onPageStarted(view, url, favicon)
-                                isLoading = true
                                 url?.let { currentUrl = it }
                             }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
-                                isLoading = false
                                 url?.let { currentUrl = it }
                                 canGoBack = canGoBack()
                                 canGoForward = canGoForward()
-                                view?.title?.let { if (it.isNotEmpty()) currentTitle = it }
                             }
 
                             override fun onReceivedError(
@@ -458,34 +346,45 @@ fun FanZonesApp(targetUrl: String) {
 
                             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 val url = request?.url?.toString() ?: return false
-                                if (url.startsWith("http://") || url.startsWith("https://")) {
-                                    return false
-                                } else {
+                                val host = request.url.host ?: ""
+
+                                // Open UPI payment intents and payment/checkout/subscription pages externally in Chrome
+                                // so UPI apps (Google Pay, PhonePe, Paytm, etc.) open properly.
+                                if (url.startsWith("upi://") || 
+                                    url.startsWith("intent://") || 
+                                    url.contains("pay") || 
+                                    url.contains("checkout") || 
+                                    url.contains("order") || 
+                                    url.contains("cart") ||
+                                    url.contains("subscribe") ||
+                                    url.contains("gateway")) {
                                     try {
                                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                         ctx.startActivity(intent)
                                     } catch (e: Exception) {
-                                        Toast.makeText(ctx, "Cannot open link", Toast.LENGTH_SHORT).show()
+                                        // Fallback if no external app handles it
+                                        return false
                                     }
                                     return true
+                                }
+
+                                // Keep fanzones.site navigation inside app
+                                if (host.contains("fanzones.site")) {
+                                    return false
+                                }
+
+                                // Open other external links in Chrome browser
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                    ctx.startActivity(intent)
+                                    return true
+                                } catch (e: Exception) {
+                                    return false
                                 }
                             }
                         }
 
                         webChromeClient = object : WebChromeClient() {
-                            override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                                super.onProgressChanged(view, newProgress)
-                                progress = newProgress / 100f
-                                if (newProgress == 100) {
-                                    isLoading = false
-                                }
-                            }
-
-                            override fun onReceivedTitle(view: WebView?, title: String?) {
-                                super.onReceivedTitle(view, title)
-                                title?.let { currentTitle = it }
-                            }
-
                             override fun onGeolocationPermissionsShowPrompt(
                                 origin: String?,
                                 callback: GeolocationPermissions.Callback?
